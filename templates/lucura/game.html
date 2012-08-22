@@ -1,0 +1,25 @@
+{% extends "lucura/base.html" %}
+
+
+{% block onload %}
+onload="player.start({{game_id}})"
+{% endblock %}
+
+{% block content %}
+<div id="game_text">
+	<div id="gamecontainer" >
+		<!-- <label id='gameID' value='{{game_id}}'>
+			game_id = {{game_id}}
+		</label> -->
+
+		<div id="gamediv"></div>
+	</div>
+</div>
+{% endblock %}
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/resize.js"></script>
+
+	<script type="text/javascript" src="{{ STATIC_URL }}closure/closure/goog/base.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/play/player.js"></script>
+{% endblock %}

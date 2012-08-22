@@ -1,0 +1,30 @@
+{% extends "lucura/base.html" %}
+
+{% block content %}
+<div id="container" class="box">
+    		<div id="First" class="content box">
+    			<div class="in">
+    				{{state|safe}}
+					{{lastDateDec}}
+					{{timeLapse}}
+					<form action = "/hub/" method="post">
+			            {% csrf_token %}
+						{% if next %}
+						<input type="hidden" name="next" value="{{next}}" />
+						{% endif %}
+						username:
+						<input type="text" name="username" value="{{username}}" /><br />
+			            password:
+						<input type="password" name="password" value="" /><br />
+
+						<input type="submit" value="Log in" />
+					</form>
+    			</div>
+    		</div>
+
+
+    		<div id="footer">
+	          <span class="f-left">&copy; 2012 <a href="http://www.chrismcmath.com">Imperial</a></span> </span>
+       		 </div>
+   		 </div>
+{% endblock %}

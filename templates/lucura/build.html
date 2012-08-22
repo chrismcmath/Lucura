@@ -1,0 +1,28 @@
+{% extends "lucura/base.html" %}
+
+
+{% block onload %}
+onload="builder.start({{game_id}})"
+{% endblock %}
+
+{% block content %}
+<div id="game_text">
+	<div id="gamecontainer">
+		<!-- <label id='gameID' value='{{game.id}}'>
+			gameID = {{game_id}}
+		</label> -->
+
+		<div id="gamediv"></div>
+	</div>
+	<!-- <div id="loginBlock" style="display:table; position:relative; z-index: 10001"> -->
+		<input id="inputCell" type="text" class = "input-xlarge" style="display:table-cell; width:100%" data-content="Enter text here..."/>
+	<!-- </div> -->
+</div>
+{% endblock %}
+
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/resize.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}closure/closure/goog/base.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/builder.js"></script>
+{% endblock %}

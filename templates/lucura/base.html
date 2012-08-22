@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>Lucura</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/style.css">
+		<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/hub.css"> <!-- can't have any spaces here -->
+		<!-- <link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet"> -->
+		<!-- <link href="{{ STATIC_URL }}css/bootstrap-responsive.css" rel="stylesheet"> -->
+	</head>
+
+	<body {% block onload %}{% endblock %}>
+	<body>
+		<div class="top_disclaimer" style="color: #6D0019">
+			Prototype 0.21c || This website is a prototype. Please do not expose any sensitive information.
+		</div>
+
+		<!-- Header -->
+
+		<header class="global sticky_header">
+			<div id="header_container">
+				<nav>
+					<ul class="main gradient">
+						<li id="menu1" class="menu menu1 gradient">
+							<a href="../../hub/" class="button">
+								<span class="border right"></span>
+								<span class="label main">Home</span>
+								<span class="sublabel"> Overview </span>
+							</a>
+							<span class="gradient_edge" style="display: none;"><span>
+						</li>
+						<li id="menu2" class="menu menu2 gradient">
+							<a href="../../games/" class="button">
+								<span class="border left"></span>
+								<span class="border right"></span>
+								<span class="label main">Play</span>
+								<span class="sublabel"> Browse all games </span>
+							</a>
+						</li>
+						<li id="menu3" class="menu menu3 gradient">
+							<a href="../../build/" class="button">
+								<span class="border left"></span>
+								<span class="border right"></span>
+								<span class="label main">Build</span>
+								<span class="sublabel"> Work on projects </span>
+							</a>
+						</li>
+						<li  id="menu4" class="menu menu4 gradient">
+							<a href="../../logout/" class="button">
+								<span class="border left"></span>
+								<span class="border right"></span>
+								<span class="label main">Logout</span>
+								<span class="sublabel"> Interact with others </span>
+							</a>
+						</li>
+						<li class="menu gradient">
+							<a href="../../login/" class="button">
+								<span class="border left"></span>
+								<span id="logo" class="label main">
+								LUCURA
+								</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+		<div id="maincontainer">
+ 		<!-- <div id="topfiller" ></div> -->
+	 		{% block content %}{% endblock %}
+	 		<!-- <div id="panelcontainer" ></div> -->
+	 	</div>
+
+		<div id="footer">
+	          <span class="f-left">&copy; 2012 <a href="http://www.chrismcmath.com">Imperial</a></span> </span>
+	   	</div>
+
+
+<!-- jquery for fast loading
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jqeury.min.js"></script>
+	-->
+		<script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.7.3.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}scripts/nav.js"></script>
+		{% block includes %}
+		{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "lucura/base.html" %}
+
+
+{% block content %}
+<div id="gameslist" >
+	{% if latest_games_list %}
+		<ul>
+			{% for game in latest_games_list %}
+				<li><a href="{{game.id}}/">{{game.title}}</a></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>No games yet, make some!</p>
+	{% endif %}
+</div>
+{% endblock %}
