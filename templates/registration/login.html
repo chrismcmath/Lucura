@@ -1,0 +1,82 @@
+{% extends "lucura/base.html" %}
+
+{% block content %}
+<div id="registration">
+	<div id="LHS">
+		<div id="loginBox" class="gameInfoBoxes">
+			<div class="formComponent" id="loginTitle">
+				Log In
+			</div>
+			<form action = "/login/?next=/games/" method="post" next="{{ next|escape }} ">
+	            {% csrf_token %}
+				{% if next %}
+				<input type="hidden" name="next" value="{{next}}" />
+				{% endif %}
+				<div class="biggerComponent" class="formComponent">
+					<h1>username:</h1>
+					<input class="userInput" type="text" name="username" value="{{username}}" /><br /> <br />
+				</div>
+				<div class="biggerComponent" class="formComponent" >
+		            <h1>password:</h1>
+					<input class="userInput" type="password" name="password" value="" /><br />
+				</div>
+				<div class="formComponent">
+					<input type="submit" value="Log in" />
+				</div>
+			</form>
+		</div>
+	</div>
+	<div id="RHS">
+		<div id="registerBox" class="gameInfoBoxes">
+			<div class="registerComponent" id="registerTitle">
+				Register new account
+			</div>
+			<form id="registrationForm" action = "/register/" action="javascript:alert('success!');" method="post">
+	            {% csrf_token %}
+				{% if next %}
+				<input type="hidden" name="next" value="{{next}}" />
+				{% endif %}
+				<div class="biggerRegisterComponent" class="registerComponent">
+					<h1>username:</h1>
+					<input class="userInput" type="text" name="regUsername" value="{{username}}" /><br /> <br />
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>password:</h1>
+					<input class="userInput" type="password" name="regPassword" value="" /><br />
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>retype password:</h1>
+					<input class="userInput" type="password" name="passwordConfirmation" value="" /><br />
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>account type:</h1>
+					<select name="accountType">
+					<option value="student">Student</option>
+					<option value="teacher">Teacher</option>
+					</select>
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>first name:</h1>
+					<input class="userInput" type="text" name="firstName" value="" /><br />
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>last name:</h1>
+					<input class="userInput" type="text" name="lastName" value="" /><br />
+				</div>
+				<div class="biggerRegisterComponent" class="registerComponent" >
+		            <h1>email:</h1>
+					<input class="userInput" type="text" name="email" value="" /><br />
+				</div>
+				<div class="registerComponent">
+					<input type="submit" value="Register" />
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/registration.js"></script>
+
+{% endblock %}
