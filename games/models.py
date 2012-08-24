@@ -38,12 +38,22 @@ class Message(models.Model):
 	timestamp = models.DateTimeField('Timestamp',auto_now_add=True)
 	posted_by = models.ForeignKey(User)
 
+class GameUserRelationship(models.Model):
+	gameID = models.ForeignKey(Game)
+	user = models.ForeignKey(User)
+	rating = models.IntegerField(null = True, blank = True)
+	score = models.IntegerField(null = True, blank = True)
+	time = models.DecimalField(max_digits = 10, decimal_places = 3, null = True, blank = True)
+	review = models.CharField(max_length=500)	
+
 
 class Layer(models.Model):
 	gameID = models.ForeignKey(Game)
 	layerID = models.IntegerField()
 	goal = models.IntegerField()
 	target = models.IntegerField()
+	xGrav = models.IntegerField()
+	yGrav = models.IntegerField()
 	timeLimit = models.IntegerField()
 	instruction = models.CharField(max_length=144)
 	background = models.CharField(max_length=200)

@@ -9,7 +9,7 @@ from django.conf import settings
 import urllib2
 from itertools import chain
 
-from games.models import Game, Message, Layer, Block
+from games.models import Game, Message, Layer, Block, GameUserRelationship
 from django.core import serializers
 # import django.utils.simplejson as json
 import json
@@ -18,6 +18,38 @@ import datetime
 from django.contrib.auth.models import User
 import pdb
 import json
+
+def registerUser(request):
+	# pdb.set_trace();
+	username = request.POST.get('regUsername')
+	fName = request.POST.get('firstName')
+	lName = request.POST.get('lastName')
+	pass1 = request.POST.get('regPassword')
+	pass2 = request.POST.get('passwordConfirmation')
+	accType = request.POST.get('accountType')
+	email = request.POST.get('accountType')
+
+	if(pass1 != pass2):
+		return HttpResponse('<h1>Passwords did not match!</h1>')
+
+	#Check nobody already has this username
+	if(User.objects.filter(username=username).count()):
+		return HttpResponse('<h1>Sorry, somebody already has that username!</h1>')
+
+	user = User.objects.create_user(
+		username=username,
+		email=email,
+		password=pass1)
+	user.first_name = fName
+	user.last_name = lName
+	if(accType == 'student'):
+		user.is_staff = 0;
+	elif(accType == 'teacher'):
+		user.is_staff = 1;
+	user.save()
+
+	#JQuery has already done the checks so we can store straight away
+	return HttpResponse("<h1>You're registered!</h1>")
 
 @login_required
 @csrf_exempt
@@ -37,7 +69,9 @@ def new_game(request):
 		target = 1,
 		timeLimit = 5,
 		instruction = '"edit this instruction"',
-		background = '""')
+		background = '"#a4c4c3"',
+		xGrav = 0,
+		yGrav = 10)
 	layer.save()
 
 	return redirect('/build/' + str(game.id))
@@ -66,6 +100,8 @@ def save_game(request):
 				layer.timeLimit = lr.get('TimeLimit')
 				layer.instruction = lr.get('Instruction')
 				layer.background = lr.get('Background')
+				layer.xGrav = lr.get('gravX')
+				layer.yGrav = lr.get('gravY')
 			else:
 				#create new layer
 				layer = Layer(gameID = game,
@@ -74,7 +110,9 @@ def save_game(request):
 				target = lr.get('Target'),
 				timeLimit = lr.get('TimeLimit'),
 				instruction = lr.get('Instruction'),
-				background = lr.get('Background'))
+				background = lr.get('Background'),
+				xGrav = lr.get('gravX'),
+				yGrav = lr.get('gravY'))
 		 	layer.save()
 		 	
 		 	blocks = lr.get('Blocks')
@@ -86,7 +124,7 @@ def save_game(request):
 		 			block.position = tempBlock.get('Position')
 		 			block.size = tempBlock.get('Size')
 			 		block.scale = tempBlock.get('Scale')
-			 		block.rotation = tempBlock.get('Rotation')
+			 		block.rotation = int(round(float(tempBlock.get('Rotation'))))
 			 		block.blockType = tempBlock.get('Type')
 			 		block.parentLayer = tempBlock.get('ParentLayer')
 			 		block.fill = tempBlock.get('Fill')
@@ -104,7 +142,7 @@ def save_game(request):
 			 		position = tempBlock.get('Position'),
 			 		size = tempBlock.get('Size'),
 			 		scale = tempBlock.get('Scale'),
-			 		rotation = tempBlock.get('Rotation'),
+			 		rotation = int(round(float(tempBlock.get('Rotation')))),
 			 		blockType = tempBlock.get('Type'),
 			 		parentLayer = tempBlock.get('ParentLayer'),
 			 		fill = tempBlock.get('Fill'),
@@ -152,7 +190,16 @@ def game(request, game_id):
 	# pdb.set_trace();
 	if request.user.is_authenticated():
 		if(Game.objects.filter(pk = game_id).count()):
-			return render_to_response('lucura/game.html',{'game_id':game_id}, context_instance=RequestContext(request))
+			gameInstance = Game.objects.get(pk=game_id)
+			if(GameUserRelationship.objects.filter(gameID = gameInstance, user = request.user).count()):
+				userInfo = GameUserRelationship.objects.get(gameID = gameInstance, user = request.user);
+			else:
+				userInfo = GameUserRelationship(
+					gameID = gameInstance,
+					user = request.user,
+					review = "")
+				userInfo.save()
+			return render_to_response('lucura/game.html',{'game_id':game_id, 'userInfo':userInfo}, context_instance=RequestContext(request))
 		else:
 			return render_to_response('missing.html',{'game_id':game_id}, context_instance=RequestContext(request))
 	else:
@@ -162,9 +209,13 @@ def game(request, game_id):
 def build_game(request, game_id):
 	if request.user.is_authenticated():
 		if(Game.objects.filter(pk = game_id).count()):
-			return render_to_response('lucura/build.html',{'game_id':game_id,},context_instance=RequestContext(request))
+			game = Game.objects.get(pk = game_id)
+			if(request.user.id != game.author_id):
+				return HttpResponse("<h1>This isn't your game.</h1>")
+			else:
+				return render_to_response('lucura/build.html',{'game_id':game_id,},context_instance=RequestContext(request))
 		else:
-			return render_to_response('missing.html',{'game_id':game_id}, context_instance=RequestContext(request))
+			return HttpResponse("<h1>Game missing</h1>")
 	else:
 		return redirect('/login/')
 
@@ -223,5 +274,49 @@ def ajaxsubmit(request):
     # Updating the message is handled by APE, so just return an empty 200
     return HttpResponse()
 
+@csrf_exempt
+@login_required
+def receiveVote(request):
+    # pdb.set_trace()
+    score = request.POST.get('vote')
+    gameID = request.POST.get('game')
+    game = Game.objects.get(pk=gameID)
+    userInfo = GameUserRelationship.objects.get(gameID = game, user = request.user)
+    userInfo.rating = score
+    userInfo.save()
+    return HttpResponse(json.dumps(score), mimetype="application/json")
+
+@csrf_exempt
+@login_required
+def receiveScore(request):
+    info = json.loads(request.body)
+    userScore = info.get('percentage')
+    time = info.get('time')
+    game = Game.objects.get(pk=info.get('gameID'))
+    userInfo = GameUserRelationship.objects.get(gameID = game, user = request.user)
+    if(userScore >= userInfo.score):
+	    userInfo.score = userScore
+	    userInfo.time = time
+	    userInfo.save()
+    return HttpResponse(status=200)
+
+@csrf_exempt
+@login_required
+def receiveReview(request):
+	review = request.POST.get('review')
+	game = Game.objects.get(pk=request.POST.get('game'))
+	userInfo = GameUserRelationship.objects.get(gameID = game, user = request.user)
+	userInfo.review = review
+	userInfo.save()
+   	return HttpResponse(status=200)
 
 
+# @csrf_exempt
+# @login_required
+# def sendUserGameData(request):
+#     pdb.set_trace()
+#     userInstance = request.user
+#     if(GameUserRelationship.objects.filter(gameID = 1).count()):
+#     	print('something')
+
+#     return HttpResponse(json.dumps(score), mimetype="application/json")
