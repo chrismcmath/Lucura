@@ -1,5 +1,10 @@
 {% extends "lucura/base.html" %}
 
+{% block early_includes %}
+	<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/colorpicker.css"> 
+		<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/layout.css"> 
+
+{% endblock %}
 
 {% block onload %}
 onload="builder.start({{game_id}})"
@@ -15,14 +20,87 @@ onload="builder.start({{game_id}})"
 		<div id="gamediv"></div>
 	</div>
 	<!-- <div id="loginBlock" style="display:table; position:relative; z-index: 10001"> -->
-		<input id="inputCell" type="text" class = "input-xlarge" style="display:table-cell; width:100%" data-content="Enter text here..."/>
+		<input id="inputCell" type="text" class = "input-xlarge" style="display:table-cell; width:100%" placeholder="Enter text here, then click 'Replace text' to copy it into the selected field" data-content="Enter text here..."/>
 	<!-- </div> -->
 </div>
 {% endblock %}
 
+{% block feedback %}
+<div id="library">
+	<div id="LHS">
+		<div id="userFeedback" class="gameInfoBoxes">
+			<div id="libDiv" class="feedbackDiv">
+				<h1>Click to insert into selected block</h1>
+				<div id="text">
+					<label class="insertLibrary"> 1 </label>
+					<label class="insertLibrary"> 2 </label>
+					<label class="insertLibrary"> 3 </label>
+					<label class="insertLibrary"> 4 </label>
+					<label class="insertLibrary"> 5 </label>
+					<label class="insertLibrary"> 6 </label>
+					<label class="insertLibrary"> 7 </label>
+					<label class="insertLibrary"> 8 </label>
+					<label class="insertLibrary"> 9 </label>
+					<label class="insertLibrary"> 0 </label>
+					<br/>
+					<label class="insertLibrary"> a </label>
+					<label class="insertLibrary"> b </label>
+					<label class="insertLibrary"> c </label>
+					<label class="insertLibrary"> d </label>
+					<label class="insertLibrary"> e </label>
+					<label class="insertLibrary"> f </label>
+					<label class="insertLibrary"> g </label>
+					<label class="insertLibrary"> h </label>
+					<label class="insertLibrary"> i </label>
+					<label class="insertLibrary"> j </label>
+					<label class="insertLibrary"> k </label>
+					<label class="insertLibrary"> l </label>
+					<label class="insertLibrary"> m </label>
+					<label class="insertLibrary"> n </label>
+					<label class="insertLibrary"> o </label>
+					<label class="insertLibrary"> p </label>
+					<label class="insertLibrary"> q </label>
+					<label class="insertLibrary"> r </label>
+					<label class="insertLibrary"> s </label>
+					<label class="insertLibrary"> t </label>
+					<label class="insertLibrary"> u </label>
+					<label class="insertLibrary"> v </label>
+					<label class="insertLibrary"> w </label>
+					<label class="insertLibrary"> x </label>
+					<label class="insertLibrary"> y </label>
+					<label class="insertLibrary"> z </label>
+
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="RHS">
+		<div id="colorPick" class="gameInfoBoxes">
+			<!-- <p id="colorpickerHolder">
+            </p> -->
+            
+			<div id="colorpickerHolder2">
+		                <div class="colorpicker" id="collorpicker_260" style="display: block; position: absolute; "><div class="colorpicker_color" style="background-color: rgb(0, 255, 0); "><div><div style="left: 150px; top: 0px; "></div></div></div><div class="colorpicker_hue"><div style="top: 100px; "></div></div><div class="colorpicker_new_color" style="background-color: rgb(0, 255, 0); "></div><div class="colorpicker_current_color" style="background-color: rgb(0, 255, 0); "></div><div class="colorpicker_hex"><input type="text" maxlength="6" size="6"></div><div class="colorpicker_rgb_r colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_rgb_g colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_rgb_b colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_hsb_h colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_hsb_s colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_hsb_b colorpicker_field"><input type="text" maxlength="3" size="3"><span></span></div><div class="colorpicker_submit"></div></div>
+		    </div>
+		    <button type="button" id="fontButton">Change Font Colour</button>
+			<button type="button" id="blockButton">Change Block Colour</button>
+			<button type="button" id="backButton">Change Background Colour</button>
+		</div>
+		
+
+	</div>	
+</div>
+
+{% endblock %}
+
 
 {% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/colorpicker/colorpicker.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/colorpicker/eye.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/colorpicker/layout.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/colorpicker/utils.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}scripts/resize.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/insertLibrary.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}closure/closure/goog/base.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}scripts/builder.js"></script>
 {% endblock %}

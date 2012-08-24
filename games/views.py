@@ -87,7 +87,7 @@ def save_game(request):
 		game.title = info.get('title')
 		game.description= info.get('description')
 		game.lastEditDate = datetime.datetime.now()
-		game.author = User.objects.get(username='chrismcmath')
+		game.author = request.user
 		game.save()
 		
 		layers = info.get('layers')
@@ -193,11 +193,14 @@ def game(request, game_id):
 			gameInstance = Game.objects.get(pk=game_id)
 			if(GameUserRelationship.objects.filter(gameID = gameInstance, user = request.user).count()):
 				userInfo = GameUserRelationship.objects.get(gameID = gameInstance, user = request.user);
+				userInfo.attempts = userInfo.attempts + 1
+				userInfo.save()
 			else:
 				userInfo = GameUserRelationship(
 					gameID = gameInstance,
 					user = request.user,
-					review = "")
+					review = "",
+					attempts = 1)
 				userInfo.save()
 			return render_to_response('lucura/game.html',{'game_id':game_id, 'userInfo':userInfo}, context_instance=RequestContext(request))
 		else:

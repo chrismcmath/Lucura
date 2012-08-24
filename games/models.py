@@ -44,7 +44,8 @@ class GameUserRelationship(models.Model):
 	rating = models.IntegerField(null = True, blank = True)
 	score = models.IntegerField(null = True, blank = True)
 	time = models.DecimalField(max_digits = 10, decimal_places = 3, null = True, blank = True)
-	review = models.CharField(max_length=500)	
+	review = models.CharField(max_length=500)
+	attempts = models.IntegerField()
 
 
 class Layer(models.Model):
@@ -75,9 +76,9 @@ class Block(models.Model):
 	nodeData = models.CharField(max_length=50)
 	isTarget = models.BooleanField()
 	text = models.CharField(max_length=1000)
-	fontFamily = models.CharField(max_length=20)
+	fontFamily = models.CharField(max_length=30)
 	fontSize = models.IntegerField()
-	fontColour = models.CharField(max_length=10)
+	fontColour = models.CharField(max_length=30)
 	
 
 
