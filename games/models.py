@@ -6,12 +6,12 @@ class Game(models.Model):
 	pubDate = models.DateTimeField('date published')
 	lastEditDate = models.DateTimeField('date last updated')
 	author = models.ForeignKey(User)
+	# uniquePlayers = models.IntegerField() NOT NEEDED AS WE CAN JOIN WITH RELATIONSHIP
 	description = models.CharField(max_length=200)
 	description.blank = True;
 	description.null = True;
 	def __unicode__(self):
 		return self.title
-
 
 # class Question(models.Model):
 # 	gameID = models.ForeignKey(Game)
@@ -33,10 +33,11 @@ class Game(models.Model):
 # 		return self.answer
 
 class Message(models.Model):
-	gameID = models.ForeignKey(Game)
 	message = models.TextField('Message')
 	timestamp = models.DateTimeField('Timestamp',auto_now_add=True)
 	posted_by = models.ForeignKey(User)
+	def __unicode__(self):
+		return self.message
 
 class GameUserRelationship(models.Model):
 	gameID = models.ForeignKey(Game)
@@ -46,6 +47,9 @@ class GameUserRelationship(models.Model):
 	time = models.DecimalField(max_digits = 10, decimal_places = 3, null = True, blank = True)
 	review = models.CharField(max_length=500)
 	attempts = models.IntegerField()
+	lastPlayedDate = models.DateTimeField('date last played')
+	def __unicode__(self):
+		return self.user
 
 
 class Layer(models.Model):

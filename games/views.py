@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 import urllib2
 from itertools import chain
+from collections import namedtuple
+from operator    import itemgetter
 
 from games.models import Game, Message, Layer, Block, GameUserRelationship
 from django.core import serializers
@@ -17,7 +19,6 @@ import datetime
 # from django.utils import simplejson 
 from django.contrib.auth.models import User
 import pdb
-import json
 
 def registerUser(request):
 	# pdb.set_trace();
@@ -30,11 +31,15 @@ def registerUser(request):
 	email = request.POST.get('accountType')
 
 	if(pass1 != pass2):
-		return HttpResponse('<h1>Passwords did not match!</h1>')
+		error = "Sorry, passwords didn't match. Please "
+		errorLink = "go back"
+		return render_to_response('lucura/error.html',{'error_msg':error,'link':errorLink}, context_instance=RequestContext(request))
 
 	#Check nobody already has this username
 	if(User.objects.filter(username=username).count()):
-		return HttpResponse('<h1>Sorry, somebody already has that username!</h1>')
+		error = "Sorry, this username is taken. Please "
+		errorLink = "go back"
+		return render_to_response('lucura/error.html',{'error_msg':error,'link':errorLink}, context_instance=RequestContext(request))
 
 	user = User.objects.create_user(
 		username=username,
@@ -49,11 +54,14 @@ def registerUser(request):
 	user.save()
 
 	#JQuery has already done the checks so we can store straight away
-	return HttpResponse("<h1>You're registered!</h1>")
+	error = "You've registered! To log in please "
+	errorLink = "go back"
+	return render_to_response('lucura/error.html',{'error_msg':error,'link':errorLink}, context_instance=RequestContext(request))
 
 @login_required
 @csrf_exempt
 def new_game(request):
+	# pdb.set_trace()
 	game = Game(
 		title = 'New Game',
 		description = 'Write a description here',
@@ -61,7 +69,7 @@ def new_game(request):
 		pubDate = datetime.datetime.now(),
 		lastEditDate = datetime.datetime.now())
 	game.save()
-	# pdb.set_trace()
+	
 	layer = Layer(
 		gameID = game,
 		layerID = 0,
@@ -155,9 +163,254 @@ def save_game(request):
 			 		fontSize = tempBlock.get('FontSize'),
 			 		fontColour = tempBlock.get('FontColour'))
 		 		block.save()
-	
-		
 	return HttpResponse(request.body, mimetype="application/json")
+
+@csrf_exempt
+@login_required
+def list_all_games(request):
+	game_list = []
+	#Get Top Game info
+
+	#Define a namedtuple to store the inf
+	GameInfo = namedtuple('GameInfo', ['ID','Title', 'Author', 'Plays', 'StudentRating', 'TeacherRating', 'AverageRating', 'Type'])
+	allGames = Game.objects.order_by('lastEditDate').reverse().select_related('gameuserrelationship')
+	for game in allGames:
+		relatedReviews = game.gameuserrelationship_set.all()
+		teacherScore = 0
+		studentScore = 0
+		teacherCount = 0
+		studentCount = 0
+		uniquePlays = 0
+		for review in relatedReviews:
+			#Update game stats
+			uniquePlays += review.attempts
+			if(review.rating):
+				print(review.rating)
+				if(review.user.is_staff):
+					teacherScore += review.rating
+					teacherCount += 1
+				else:
+					studentScore += review.rating
+					studentCount += 1
+			else:
+				print('no score :(')
+		#Check for divide by zero
+
+		if(teacherCount == 0):
+			avgTeacherScore = 0
+		else:
+			avgTeacherScore = teacherScore/teacherCount
+		if(studentCount == 0):
+			avgStudentScore = 0
+		else:
+			avgStudentScore = studentScore/studentCount
+		avgScore = float(avgTeacherScore+avgStudentScore)/2
+		#Convert star scores into percentanges (for div)
+		studentPercentage = (float(avgStudentScore)/5)*100
+		teacherPercentage = (float(avgTeacherScore)/5)*100
+		avgPercentage = (avgScore/5)*100
+
+		#Get author's username
+		username = game.author.username
+		#Find out if the author is a teacher of student
+		if(game.author.is_staff):
+			typeColour = "teacherColour"
+		else:
+			typeColour = "studentColour"
+
+		#Store details in an named tuple
+		tempGame = GameInfo(
+			ID=game.id,
+			Title = game.title,
+			Author = username,
+			Plays = uniquePlays,
+			StudentRating = studentPercentage,
+			TeacherRating = teacherPercentage,
+			AverageRating = avgPercentage,
+			Type = typeColour)
+		game_list.append(tempGame)
+	#Sort the list, secondary key is number of plays
+	# tempList = game_list.sort(key=itemgetter(3), reverse=True)
+	# game_list.sort(tempList, key=itemgetter(6), reverse=True)
+	all_games_list = game_list
+
+	return render_to_response('lucura/games_list.html', {'all_games_list' : all_games_list},context_instance=RequestContext(request))
+
+@csrf_exempt
+@login_required
+def list_games(request):
+	game_list = []
+	#Get Top Game info
+
+	#Define a namedtuple to store the info
+	GameInfo = namedtuple('GameInfo', ['ID','Title', 'Author', 'Plays', 'StudentRating', 'TeacherRating', 'AverageRating', 'Type'])
+	allGames = Game.objects.select_related('gameuserrelationship')
+	for game in allGames:
+		relatedReviews = game.gameuserrelationship_set.all()
+		teacherScore = 0
+		studentScore = 0
+		teacherCount = 0
+		studentCount = 0
+		uniquePlays = 0
+		for review in relatedReviews:
+			#Update game stats
+			uniquePlays += review.attempts
+			if(review.rating):
+				print(review.rating)
+				if(review.user.is_staff):
+					teacherScore += review.rating
+					teacherCount += 1
+				else:
+					studentScore += review.rating
+					studentCount += 1
+			else:
+				print('no score :(')
+		#Check for divide by zero
+
+		if(teacherCount == 0):
+			avgTeacherScore = 0
+		else:
+			avgTeacherScore = teacherScore/teacherCount
+		if(studentCount == 0):
+			avgStudentScore = 0
+		else:
+			avgStudentScore = studentScore/studentCount
+		avgScore = float(avgTeacherScore+avgStudentScore)/2
+		#Convert star scores into percentanges (for div)
+		studentPercentage = (float(avgStudentScore)/5)*100
+		teacherPercentage = (float(avgTeacherScore)/5)*100
+		avgPercentage = (avgScore/5)*100
+
+		#Get author's username
+		username = game.author.username
+		#Find out if the author is a teacher of student
+		if(game.author.is_staff):
+			typeColour = "teacherColour"
+		else:
+			typeColour = "studentColour"
+
+		#Store details in an named tuple
+		tempGame = GameInfo(
+			ID=game.id,
+			Title = game.title,
+			Author = username,
+			Plays = uniquePlays,
+			StudentRating = studentPercentage,
+			TeacherRating = teacherPercentage,
+			AverageRating = avgPercentage,
+			Type = typeColour)
+		game_list.append(tempGame)
+	#Sort the list, secondary key is number of plays
+	tempList = game_list.sort(key=itemgetter(3), reverse=True)
+	game_list.sort(tempList, key=itemgetter(6), reverse=True)
+	top_games_list = game_list[0:10]
+	all_games_list = game_list
+
+	game_list = []
+
+	#Get user games info
+	UserGameInfo = namedtuple('UserGameInfo', ['ID', 'Title', 'Plays', 'AverageRating'])
+	userGames = Game.objects.filter(author_id = request.user).select_related('gameuserrelationship')
+	for game in userGames:
+		relatedReviews = game.gameuserrelationship_set.all()
+		teacherScore = 0
+		studentScore = 0
+		teacherCount = 0
+		studentCount = 0
+		uniquePlays = 0
+		for review in relatedReviews:
+			#Update game stats
+			uniquePlays += review.attempts
+			if(review.rating):
+				print(review.rating)
+				if(review.user.is_staff):
+					teacherScore += review.rating
+					teacherCount += 1
+				else:
+					studentScore += review.rating
+					studentCount += 1
+
+		#Check for divide by zero
+		if(teacherCount == 0):
+			avgTeacherScore = 0
+		else:
+			avgTeacherScore = teacherScore/teacherCount
+		if(studentCount == 0):
+			avgStudentScore = 0
+		else:
+			avgStudentScore = studentScore/studentCount
+		avgScore = float(avgTeacherScore+avgStudentScore)/2
+		#Convert star scores into percentanges (for div)
+		avgPercentage = (avgScore/5)*100
+
+		#Store details in an named tuple
+		tempGame = UserGameInfo(
+			ID=game.id,
+			Title = game.title,
+			Plays = uniquePlays,
+			AverageRating = avgPercentage)
+		game_list.append(tempGame)
+	#Sort the list, secondary key is number of plays
+	user_games_list = game_list[0:10]
+
+	game_list = []
+
+	#Get Recently Played list
+	RecentlyPlayedInfo = namedtuple('RecentlyPlayedInfo', ['ID','Title', 'Attempts', 'Score'])
+	allRelationships = GameUserRelationship.objects.filter(user=request.user).order_by('lastPlayedDate').reverse().select_related('game')
+	for relationship in allRelationships:
+		if(relationship.score):
+			score =	relationship.score
+		else:
+			score = 0
+		tempGame = RecentlyPlayedInfo(
+			ID= relationship.gameID.id,
+			Title = relationship.gameID.title,
+			Attempts = relationship.attempts,
+			Score = score)
+		game_list.append(tempGame)
+	recently_played_list = game_list[0:10]
+
+	player_list = []
+
+	#Create list of top players
+	sorted_games_list = all_games_list
+	sorted_games_list.sort(key=itemgetter(0), reverse=False)
+	TopPlayerInfo = namedtuple('TopPlayerInfo', ['Username', 'Played', 'Score', 'Type'])
+	allUsers = User.objects.all().select_related('gameuserrelationship')
+	for user in allUsers:
+		#Assign colour
+		if(user.is_staff):
+			typeColour = "teacherColour"
+		else:
+			typeColour = "studentColour"
+		user_relationship = user.gameuserrelationship_set.all()
+		totalPercentage = 0;
+		for relationship in user_relationship:
+			if(relationship.score):
+				score =	relationship.score
+			else:
+				score = 0
+			gameID = relationship.gameID.id
+			teacherRatio = sorted_games_list[gameID-1].TeacherRating
+			adjustedPercentage = float(score) * (float(teacherRatio)/100)
+			totalPercentage += adjustedPercentage
+		tempUser = TopPlayerInfo(
+			Username = user.username,
+			Played = user_relationship.count(),
+			Score = totalPercentage,
+			Type = typeColour)
+		player_list.append(tempUser)
+	tempList = player_list.sort(key=itemgetter(1), reverse=True)
+	player_list.sort(tempList, key=itemgetter(2), reverse=True)
+	top_players_list = player_list[0:10]
+
+	return render_to_response('lucura/games.html', {
+		'top_games_list' : top_games_list,
+		'user_games_list': user_games_list,
+		'recently_played_list': recently_played_list,
+		'top_players_list' : top_players_list},
+		context_instance=RequestContext(request))
 
 #Function to pass game data to gameJS.js
 @csrf_exempt
@@ -192,19 +445,23 @@ def game(request, game_id):
 		if(Game.objects.filter(pk = game_id).count()):
 			gameInstance = Game.objects.get(pk=game_id)
 			if(GameUserRelationship.objects.filter(gameID = gameInstance, user = request.user).count()):
-				userInfo = GameUserRelationship.objects.get(gameID = gameInstance, user = request.user);
+				userInfo = GameUserRelationship.objects.get(gameID = gameInstance, user = request.user)
 				userInfo.attempts = userInfo.attempts + 1
+				userInfo.lastPlayedDate = datetime.datetime.now()
 				userInfo.save()
 			else:
 				userInfo = GameUserRelationship(
 					gameID = gameInstance,
 					user = request.user,
-					review = "",
-					attempts = 1)
+					score = 0,
+					time = 0,
+					rating = 3,
+					attempts = 1,
+					lastPlayedDate = datetime.datetime.now())
 				userInfo.save()
 			return render_to_response('lucura/game.html',{'game_id':game_id, 'userInfo':userInfo}, context_instance=RequestContext(request))
 		else:
-			return render_to_response('missing.html',{'game_id':game_id}, context_instance=RequestContext(request))
+			return render_to_response('lucura/missing.html', context_instance=RequestContext(request))
 	else:
 		return redirect('/login/')
 
@@ -214,11 +471,13 @@ def build_game(request, game_id):
 		if(Game.objects.filter(pk = game_id).count()):
 			game = Game.objects.get(pk = game_id)
 			if(request.user.id != game.author_id):
-				return HttpResponse("<h1>This isn't your game.</h1>")
+				error = "Sorry, you are only allowed to edit "
+				errorLink = "your own games!"
+				return render_to_response('lucura/forbidden.html',{'error_msg':error,'link':errorLink}, context_instance=RequestContext(request))
 			else:
 				return render_to_response('lucura/build.html',{'game_id':game_id,},context_instance=RequestContext(request))
 		else:
-			return HttpResponse("<h1>Game missing</h1>")
+			return render_to_response('lucura/missing.html', context_instance=RequestContext(request))
 	else:
 		return redirect('/login/')
 
@@ -228,6 +487,59 @@ def build_new_game(request, game_id):
 		return render_to_response('build.html',{},context_instance=RequestContext(request))
 	else:
 		return redirect('/login/')
+
+@login_required
+def build_list(request):
+	game_list = []
+	UserGameInfo = namedtuple('UserGameInfo', ['ID', 'Title', 'Plays', 'StudentRating', 'TeacherRating', 'AverageRating'])
+	userGames = Game.objects.filter(author_id = request.user).order_by('pubDate').reverse().select_related('gameuserrelationship')
+	for game in userGames:
+		relatedReviews = game.gameuserrelationship_set.all()
+		teacherScore = 0
+		studentScore = 0
+		teacherCount = 0
+		studentCount = 0
+		uniquePlays = 0
+		for review in relatedReviews:
+			#Update game stats
+			uniquePlays += review.attempts
+			if(review.rating):
+				print(review.rating)
+				if(review.user.is_staff):
+					teacherScore += review.rating
+					teacherCount += 1
+				else:
+					studentScore += review.rating
+					studentCount += 1
+
+		#Check for divide by zero
+		if(teacherCount == 0):
+			avgTeacherScore = 0
+		else:
+			avgTeacherScore = teacherScore/teacherCount
+		if(studentCount == 0):
+			avgStudentScore = 0
+		else:
+			avgStudentScore = studentScore/studentCount
+		avgScore = float(avgTeacherScore+avgStudentScore)/2
+		#Convert star scores into percentanges (for div)
+		studentPercentage = (float(avgStudentScore)/5)*100
+		teacherPercentage = (float(avgTeacherScore)/5)*100
+		avgPercentage = (avgScore/5)*100
+
+		#Store details in an named tuple
+		tempGame = UserGameInfo(
+			ID=game.id,
+			Title = game.title,
+			Plays = uniquePlays,
+			StudentRating = studentPercentage,
+			TeacherRating = teacherPercentage,
+			AverageRating = avgPercentage)
+		game_list.append(tempGame)
+	#Sort the list, secondary key is number of plays
+	user_games_list = game_list[0:20]
+
+	return render_to_response('lucura/build_list.html', {'user_games_list' : user_games_list},	context_instance=RequestContext(request))
 
 
 #Test stuff
@@ -279,8 +591,37 @@ def ajaxsubmit(request):
 
 @csrf_exempt
 @login_required
+def receiveMessage(request):
+	message = Message(message = request.POST['message'],
+    	posted_by = request.user,
+    	timestamp = datetime.datetime.now())
+	message.save()
+	return HttpResponse()
+
+@csrf_exempt
+@login_required
+def sendMessages(request):
+	messages = Message.objects.order_by().order_by('timestamp').reverse()[0:5]
+	# pdb.set_trace()
+	MessageInfo = namedtuple('MessageInfo', ['Message', 'Author', 'Type'])
+	messageTuples = []
+	for msg in messages:
+		if(msg.posted_by.is_staff):
+			typeColour = "teacherColour"
+		else:
+			typeColour = "studentColour"
+		tempMsg = MessageInfo(
+			Message = msg.message,
+			Author = msg.posted_by.username,
+			Type = typeColour)
+		messageTuples.append(tempMsg)
+
+	# msgJSON = serializers.serialize("json", messages)
+	return HttpResponse(json.dumps(messageTuples), mimetype="application/json")
+
+@csrf_exempt
+@login_required
 def receiveVote(request):
-    # pdb.set_trace()
     score = request.POST.get('vote')
     gameID = request.POST.get('game')
     game = Game.objects.get(pk=gameID)
@@ -292,16 +633,21 @@ def receiveVote(request):
 @csrf_exempt
 @login_required
 def receiveScore(request):
-    info = json.loads(request.body)
-    userScore = info.get('percentage')
-    time = info.get('time')
-    game = Game.objects.get(pk=info.get('gameID'))
-    userInfo = GameUserRelationship.objects.get(gameID = game, user = request.user)
-    if(userScore >= userInfo.score):
-	    userInfo.score = userScore
-	    userInfo.time = time
-	    userInfo.save()
-    return HttpResponse(status=200)
+	info = json.loads(request.body)
+	userScore = info.get('percentage')
+	time = info.get('time')
+	game = Game.objects.get(pk=info.get('gameID'))
+	userInfo = GameUserRelationship.objects.get(gameID = game, user = request.user)
+	if(userScore > userInfo.score):
+		userInfo.score = userScore
+		userInfo.time = time
+		userInfo.save()
+	elif(userScore == userInfo.score):
+		if(time < userInfo.time):
+			userInfo.score = userScore
+			userInfo.time = time
+			userInfo.save()
+	return HttpResponse(status=200)
 
 @csrf_exempt
 @login_required

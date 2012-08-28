@@ -37,7 +37,7 @@
 								<span class="border left"></span>
 								<span class="border right"></span>
 								<span class="label main">Play</span>
-								<span class="sublabel"> Browse all games </span>
+								<span class="sublabel"> Browse games </span>
 							</a>
 						</li>
 						<li id="menu3" class="menu menu3 gradient">
@@ -48,20 +48,18 @@
 								<span class="sublabel"> Work on projects </span>
 							</a>
 						</li>
-						<li  id="menu4" class="menu menu4 gradient">
+						<li class="lucuraTitle menu gradient" id="menuTitle" style="width: 400px;">
+								<span class="border left"></span>
+								<span id="logo" class="label main" style="position:absolute;">
+								LUCURA
+								</span>
+						</li>
+						<li  id="menu4" class="menu menu4 gradient" style="right:0px; float:right;">
 							<a href="../../logout/" class="button">
 								<span class="border left"></span>
 								<span class="border right"></span>
 								<span class="label main">Logout</span>
-								<span class="sublabel"> Interact with others </span>
-							</a>
-						</li>
-						<li class="menu gradient" id="menuTitle">
-							<a href="" class="button">
-								<span class="border left"></span>
-								<span id="logo" class="label main">
-								LUCURA
-								</span>
+								<!-- <span class="sublabel"> Interact with others </span> -->
 							</a>
 						</li>
 					</ul>
@@ -93,7 +91,8 @@
 <!-- jquery for fast loading
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jqeury.min.js"></script>
 	-->
-		<script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.7.3.js"></script>
+		<!-- // <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.7.3.js"></script> -->
+		<script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.8.0.min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}scripts/nav.js"></script>
 		{% block includes %}
 		{% endblock %}

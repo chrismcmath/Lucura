@@ -1,19 +1,78 @@
 {% extends "lucura/base.html" %}
 
+{% block early_includes %}
+	<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/list.css"> 
+{% endblock %}
 
 {% block content %}
-<div id="gameslist" >
-	{% if latest_games_list %}
-		<ul>
-			{% for game in latest_games_list %}
-				<li><a href="{{game.id}}/">{{game.title}}</a></li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<p>No games yet, make some!</p>
-	{% endif %}
+<div class="fullBox">
+	<div id="userGamesFull" class="listBack listExtended">
+		<h1>Your Games</h1>
+		<div id="userGameListFull" class="listDiv">
+			<div class="nameColumn listColumn">
+				{%for game in user_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					{{game.Title}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="studentRatingColumn listColumn">
+				{%for game in user_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="studentRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.StudentRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="teacherRatingColumn listColumn">
+				{%for game in user_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="teacherRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.TeacherRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="playsColumn listColumn">
+				{%for game in user_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					{{game.Plays}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="averageRatingColumn listColumn">
+				{%for game in user_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="avgRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.AverageRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+		</div>
+	</div>
 </div>
-<div id="newGame" >
-	<a href="new_game/">New Game</a>
+
+<div class="buttonBox">
+	<a href='/build/new_game/'>
+		<div class="buttonSize">
+			<h1>Build new game</h1>
+		</div>
+	</a>
 </div>
+
+{% endblock %}
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/listFunctionality.js"></script>
 {% endblock %}
