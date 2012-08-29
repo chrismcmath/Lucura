@@ -310,7 +310,7 @@ def list_games(request):
 
 	#Get user games info
 	UserGameInfo = namedtuple('UserGameInfo', ['ID', 'Title', 'Plays', 'AverageRating'])
-	userGames = Game.objects.filter(author_id = request.user).select_related('gameuserrelationship')
+	userGames = Game.objects.filter(author_id = request.user).order_by('pubDate').reverse().select_related('gameuserrelationship')
 	for game in userGames:
 		relatedReviews = game.gameuserrelationship_set.all()
 		teacherScore = 0
