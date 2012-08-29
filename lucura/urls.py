@@ -3,6 +3,7 @@ from django.views.generic import ListView
 from games.models import Game
 from django.conf import settings
 from django.contrib.auth.views import login, logout
+from django.views.generic.simple import redirect_to
 
 # import django_socketo.urls
 
@@ -14,6 +15,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # (r'^login/$', 'auth.views.login_user'),
+    (r'^$', redirect_to, {'url': '/games/'}),
     (r'^login/$', login),
     (r'^accounts/login/$', login),
     (r'^register/$', 'games.views.registerUser'),
