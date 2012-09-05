@@ -79,41 +79,6 @@ onload="player.start({{game_id}})"
 {% endblock %}
 
 {% block feedback %}
-<!-- <div id="feedback">
-	<div id="LHS">
-		<div id="userFeedback" class="gameInfoBoxes">
-			<div id="starDiv" class="feedbackDiv">
-				<h1>Rating</h1>
-				<div id="stars" class="userInput">
-					<ul class="star-rating" style="margin:auto" >
-						<li class="current-rating" style="width:60%;">Currently 3/5 Stars.</li>
-						<li><a href="#" title="1 star out of 5" star='1' class="one-star">1</a></li>
-						<li><a href="#" title="2 stars out of 5" class="two-stars">2</a></li>
-						<li><a href="#" title="3 stars out of 5" class="three-stars">3</a></li>
-						<li><a href="#" title="4 stars out of 5" class="four-stars">4</a></li>
-						<li><a href="#" title="5 stars out of 5" class="five-stars">5</a></li>
-					</ul>
-				</div>
-			</div>
-			<div id="scoreDiv" class="feedbackDiv">
-				<h1>Top Score</h1>
-				<div id="score" class="userInput">
-					{{userInfo.score}}% <br/> <span id="inputTime" style="font-size:15px">{{userInfo.time}}</span>
-				</div>
-			</div>
-			<div id="reviewDiv" class="feedbackDiv">
-				<h1>Review</h1>
-				<div id="review" class="userInput">
-						<textarea style="resize: none;" id="review" placeholder="No review yet!" maxlength="500" height="100"></textarea>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="RHS">
-		<div id="chat" class="gameInfoBoxes">
-		</div>
-	</div>	
-</div> -->
 
 {% endblock %}
 
@@ -121,7 +86,7 @@ onload="player.start({{game_id}})"
 	<script type="text/javascript" src="{{ STATIC_URL }}scripts/resize.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}scripts/messaging.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}scripts/starRating.js"></script>
-	<!-- // <script type="text/javascript" src="{{ STATIC_URL }}closure/closure/goog/base.js"></script> -->
-	<!-- // <script type="text/javascript" src="{{ STATIC_URL }}scripts/play/player.js"></script> -->
-	<script type="text/javascript" src="{{ STATIC_URL }}compiled/play.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}closure/closure/goog/base.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/play/player.js"></script>
+	<!-- // <script type="text/javascript" src="{{ STATIC_URL }}compiled/play.js"></script> -->
 {% endblock %}

@@ -192,10 +192,7 @@ def list_all_games(request):
 				else:
 					studentScore += review.rating
 					studentCount += 1
-			else:
-				print('no score :(')
 		#Check for divide by zero
-
 		if(teacherCount == 0):
 			avgTeacherScore = 0
 		else:
@@ -229,9 +226,6 @@ def list_all_games(request):
 			AverageRating = avgPercentage,
 			Type = typeColour)
 		game_list.append(tempGame)
-	#Sort the list, secondary key is number of plays
-	# tempList = game_list.sort(key=itemgetter(3), reverse=True)
-	# game_list.sort(tempList, key=itemgetter(6), reverse=True)
 	all_games_list = game_list
 
 	return render_to_response('lucura/games_list.html', {'all_games_list' : all_games_list},context_instance=RequestContext(request))
@@ -263,10 +257,7 @@ def list_games(request):
 				else:
 					studentScore += review.rating
 					studentCount += 1
-			else:
-				print('no score :(')
 		#Check for divide by zero
-
 		if(teacherCount == 0):
 			avgTeacherScore = 0
 		else:
@@ -658,14 +649,3 @@ def receiveReview(request):
 	userInfo.review = review
 	userInfo.save()
    	return HttpResponse(status=200)
-
-
-# @csrf_exempt
-# @login_required
-# def sendUserGameData(request):
-#     pdb.set_trace()
-#     userInstance = request.user
-#     if(GameUserRelationship.objects.filter(gameID = 1).count()):
-#     	print('something')
-
-#     return HttpResponse(json.dumps(score), mimetype="application/json")
