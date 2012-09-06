@@ -1,0 +1,76 @@
+{% extends "lucura/base.html" %}
+
+{% block early_includes %}
+	<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/list.css"> 
+{% endblock %}
+
+{% block content %}
+<div class="extendedBox">
+	<div id="userGamesFull" class="listBack listExtended">
+		<h1>Latest Games</h1>
+		<div id="recentAdditionsList" class="listDiv">
+			<div class="nameColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					{{game.Title}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="authorColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field {{game.Type}}" gameID="{{game.ID}}">
+					{{game.Author}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="studentRatingColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="studentRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.StudentRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="teacherRatingColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="teacherRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.TeacherRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="playsColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					{{game.Plays}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="averageRatingColumn listColumn">
+				{%for game in all_games_list%}
+				<div class="field" gameID="{{game.ID}}">
+					<div class="classification" id="avgRating{{game.ID}}">
+						<div class="cover">
+						</div>
+						<div class="progress" style="width:{{game.AverageRating}}%;">
+						</div>
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/listFunctionality.js"></script>
+{% endblock %}

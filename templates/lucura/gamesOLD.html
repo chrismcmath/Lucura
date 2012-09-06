@@ -1,0 +1,132 @@
+{% extends "lucura/base.html" %}
+
+{% block early_includes %}
+	<link rel="stylesheet" media="screen" type="text/css" href="{{ STATIC_URL }}css/list.css"> 
+{% endblock %}
+
+{% block content %}
+<!-- <div id="gameslist" >
+	{% if latest_games_list %}
+		<ul>
+			{% for game in latest_games_list %}
+				<li><a href="{{game.id}}/">{{game.title}}</a></li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>No games yet, make some!</p>
+	{% endif %}
+</div> -->
+
+<div class="gameBox">
+	<div id="topGames" class="listBack listFull">
+		<h1>Top Games</h1>
+		<div id="topGameList" class="listDiv">
+			<div class="nameColumn listColumn">
+				{%for game in top_games_list%}
+				<div class="field">
+					{{game.Title}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="authorColumn listColumn">
+				{%for game in top_games_list%}
+				<div class="field">
+					{{game.Author}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="studentRatingColumn listColumn">
+				{%for game in top_games_list%}
+				<!-- <div class="field">
+					{{game.StudentRating}}
+					{% if game.StudentRating >= 1 %}
+					<span>★</span>
+					{%endif%}
+					{% if game.StudentRating >= 2 %}
+					<span>★</span>
+					{%endif%}
+					{% if game.StudentRating >= 3 %}
+					<span>★</span>
+					{%endif%}
+					{% if game.StudentRating >= 4 %}
+					<span>★</span>
+					{%endif%}
+					{% if game.StudentRating >= 5 %}
+					<span>★</span>
+					{%endif%}
+
+				</div> -->
+				<div class="classification" id="studentRating{{game.ID}}">
+					<div class="cover">
+					</div>
+					<div class="progress" style="width:{{game.StudentRating}}%;">
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="teacherRatingColumn listColumn">
+				{%for game in top_games_list%}
+				<div class="classification" id="teacherRating{{game.ID}}">
+					<div class="cover">
+					</div>
+					<div class="progress" style="width:{{game.TeacherRating}}%;">
+					</div>
+				</div>
+				{%endfor%}
+			</div>
+			<div class="playsColumn listColumn">
+				{%for game in top_games_list%}
+				<div class="field">
+					{{game.Plays}}
+				</div>
+				{%endfor%}
+			</div>
+			<div class="averageRatingColumn listColumn">
+				{%for game in top_games_list%}
+				<div class="classification" id="avgRating{{game.ID}}">
+					<div class="cover">
+					</div>
+					<div class="progress" style="width:{{game.AverageRating}}%;">
+					</div>
+				</div>
+				<!-- <div class='fiveStarsDiv'>
+					<div class='fiveStars'>
+						★★★★★
+					</div>
+				</div> -->
+				{%endfor%}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="gameBox">
+	<div id="userGames" class="listBack listLeft">
+		<h1>Your Games</h1>
+		<div id="userGamesList" class="listDiv">
+		</div>
+	</div>
+	<div id="topUsers" class="listBack listRight">
+		<h1>Top Users</h1>
+		<div id="topUserList" class="listDiv">
+		</div>
+	</div>
+</div>
+<div class="gameBox">
+	<div id="recentPlayed" class="listBack listLeft">
+		<h1>Recently Played</h1>
+		<div id="recentList" class="listDiv">
+		</div>
+	</div>
+	<div id="gamesChat" class="listBack listRight">
+		<h1>Messages</h1>
+		<div id="chatList" class="listDiv">
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block includes %}
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/ellipsis.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/listFunctionality.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}scripts/resizer.js"></script>
+{% endblock %}
