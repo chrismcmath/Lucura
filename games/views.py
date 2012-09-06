@@ -1,4 +1,4 @@
-# Create your views here.
+# Lucura logic game logic. This file also handles user statistics.
 
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -10,18 +10,15 @@ import urllib2
 from itertools import chain
 from collections import namedtuple
 from operator    import itemgetter
-
 from games.models import Game, Message, Layer, Block, GameUserRelationship
 from django.core import serializers
-# import django.utils.simplejson as json
 import json
 import datetime
-# from django.utils import simplejson 
 from django.contrib.auth.models import User
 import pdb
 
 def registerUser(request):
-	# pdb.set_trace();
+
 	username = request.POST.get('regUsername')
 	fName = request.POST.get('firstName')
 	lName = request.POST.get('lastName')
@@ -61,7 +58,7 @@ def registerUser(request):
 @login_required
 @csrf_exempt
 def new_game(request):
-	# pdb.set_trace()
+	#Create a new game
 	game = Game(
 		title = 'New Game',
 		description = 'Write a description here',
@@ -83,7 +80,6 @@ def new_game(request):
 	layer.save()
 
 	return redirect('/build/' + str(game.id))
-	# return render_to_response('build.html',{'game_id':game.id}, context_instance=RequestContext(request))
 
 @login_required
 @csrf_exempt
@@ -125,7 +121,6 @@ def save_game(request):
 		 	
 		 	blocks = lr.get('Blocks')
 		 	for tempBlock in blocks:
-		 		# pdb.set_trace()
 		 		if(Block.objects.filter(layerID = layer, blockID = tempBlock.get('ID')).count()):
 		 			#BLOCK already exists, update
 		 			block = Block.objects.get(layerID = layer, blockID = tempBlock.get('ID'))
@@ -185,7 +180,6 @@ def list_all_games(request):
 			#Update game stats
 			uniquePlays += review.attempts
 			if(review.rating):
-				print(review.rating)
 				if(review.user.is_staff):
 					teacherScore += review.rating
 					teacherCount += 1
@@ -250,7 +244,6 @@ def list_games(request):
 			#Update game stats
 			uniquePlays += review.attempts
 			if(review.rating):
-				print(review.rating)
 				if(review.user.is_staff):
 					teacherScore += review.rating
 					teacherCount += 1
@@ -313,7 +306,6 @@ def list_games(request):
 			#Update game stats
 			uniquePlays += review.attempts
 			if(review.rating):
-				print(review.rating)
 				if(review.user.is_staff):
 					teacherScore += review.rating
 					teacherCount += 1
@@ -415,10 +407,8 @@ def get_game(request, game_id):
 	layers = game.layer_set.all()
 
 	# Get all blocks
-	# pdb.set_trace()
 	blocks = {}
 	for (counter,lr) in enumerate(layers):
-		print('count: ' + str(counter))
 		blocks[counter] = lr.block_set.all()
 
 	allData = list(chain(Game.objects.filter(pk=gameID),layers))
@@ -431,7 +421,6 @@ def get_game(request, game_id):
 #Is there any way of getting this data directly to javascript?
 @login_required
 def game(request, game_id):
-	# pdb.set_trace();
 	if request.user.is_authenticated():
 		if(Game.objects.filter(pk = game_id).count()):
 			gameInstance = Game.objects.get(pk=game_id)
@@ -495,7 +484,6 @@ def build_list(request):
 			#Update game stats
 			uniquePlays += review.attempts
 			if(review.rating):
-				print(review.rating)
 				if(review.user.is_staff):
 					teacherScore += review.rating
 					teacherCount += 1
@@ -533,29 +521,13 @@ def build_list(request):
 	return render_to_response('lucura/build_list.html', {'user_games_list' : user_games_list},	context_instance=RequestContext(request))
 
 
-#Test stuff
-
-# @csrf_exempt
-# @login_required
-# def message_view(request):
-# 	# pdb.set_trace()
-# 	if request.method == 'POST':
-# 		newMessage = Message(message = request.POST['message'],
-# 			posted_by = User.objects.get(username=request.user.username),
-# 			questionID = Question.objects.get(pk=1))
-# 		newMessage.save()
-# 	messages = Message.objects.all()
-# 	return render_to_response('messages.html',{'messages':messages},context_instance=RequestContext(request))
-
 @csrf_exempt
 @login_required
 def message_view(request):
-    # pdb.set_trace()
     messages = Message.objects.all()
     return render_to_response('messages.html', {'messages': messages},context_instance=RequestContext(request))
 
 @csrf_exempt
-# @login_required
 def ajaxsubmit(request):
     pdb.set_trace()
     new_msg = Message(message = request.POST['message'],
@@ -592,11 +564,12 @@ def receiveMessage(request):
 @csrf_exempt
 @login_required
 def sendMessages(request):
+	#Retrieve the most recent messages
 	messages = Message.objects.order_by().order_by('timestamp').reverse()[0:5]
-	# pdb.set_trace()
 	MessageInfo = namedtuple('MessageInfo', ['Message', 'Author', 'Type'])
 	messageTuples = []
 	for msg in messages:
+		#Assign the class tag for colouring
 		if(msg.posted_by.is_staff):
 			typeColour = "teacherColour"
 		else:
@@ -607,7 +580,6 @@ def sendMessages(request):
 			Type = typeColour)
 		messageTuples.append(tempMsg)
 
-	# msgJSON = serializers.serialize("json", messages)
 	return HttpResponse(json.dumps(messageTuples), mimetype="application/json")
 
 @csrf_exempt
